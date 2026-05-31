@@ -45,6 +45,9 @@ LifeOps is an intelligent automation system that acts as your personal AI chief-
   - Personalized motivational message
 - Saves the report to your backend
 
+  <img width="1919" height="1024" alt="image" src="https://github.com/user-attachments/assets/0e15fd88-afeb-4785-bede-3574768b37fe" />
+
+
 ### 💬 Conversational AI (fallback)
 - If your message isn't about scheduling, the agent responds as a general assistant
 - Maintains conversation memory per user via Postgres
