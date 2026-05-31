@@ -1,0 +1,2619 @@
+{
+  "name": "LifeOps Personal Planing Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.from.id }}",
+        "text": "={{ $json.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5776,
+        336
+      ],
+      "id": "0ef71b21-ad0a-48ca-af5b-6e9e4d8aa979",
+      "name": "Send a text message",
+      "webhookId": "aac1f9d6-0c6d-44b9-9488-120e4372edc2",
+      "credentials": {
+        "telegramApi": {
+          "id": "IRiOWzqEIMh1ShxI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        1600
+      ],
+      "id": "15da9e85-8023-4d78-a6a2-2d0af890d905",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "timeMax": "={{ $now.plus({ second: 300 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        1600
+      ],
+      "id": "6cb05081-fbe8-4ee7-980d-fdcb2abffa52",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a6255320-89e3-4a38-b8fd-c7782832c8c8",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "No reminders right now.",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        1696
+      ],
+      "id": "6d717d66-195a-4ef6-aa9d-b34d7d0bf6ef",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "your@email.com",
+        "subject": "Upcomig Event Reminder",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        1696
+      ],
+      "id": "5f8dc5e2-f31e-4474-b54e-cbb941511240",
+      "name": "Send a message",
+      "webhookId": "9eba0638-ef2f-4c26-b2a3-e3b63381401c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xG1hzKIsoOlDhoaF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "triggerOn": "eventStarted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1792
+      ],
+      "id": "b23f779e-9ee1-4c65-b296-a82c66fa558c",
+      "name": "Google Calendar Trigger",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        416
+      ],
+      "id": "fee47fd4-70a0-4aca-9ad4-f67877cd5ce5",
+      "name": "Telegram Trigger",
+      "webhookId": "4781670b-e14a-4bdc-973d-333c60643160",
+      "credentials": {
+        "telegramApi": {
+          "id": "IRiOWzqEIMh1ShxI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "study",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "869d0adf-9414-4a6e-9ce0-c34963813887"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d6f5340d-25b2-4cf7-9389-21f7a930a946",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "fitness",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fca8f4a8-142d-45a6-b45c-db13e13735f5",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "other plans",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c4459a61-6a0f-484a-9307-6ac208a16519",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        384
+      ],
+      "id": "023aaede-ad53-47d3-bd25-0730d5cd5413",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "summary": "={{ $json.title }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        4976,
+        336
+      ],
+      "id": "2f3622ba-4dcd-46f7-bc09-8940682a933c",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        1072
+      ],
+      "id": "f7c30c07-fa1c-44f0-bc96-ca17755e3a14",
+      "name": "Create an event in Google Calendar2",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1488,
+        1072
+      ],
+      "id": "95dd960b-4ad9-4dd7-afbc-d14782307119",
+      "name": "Delete an event in Google Calendar2",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1616,
+        1072
+      ],
+      "id": "b6db6f8f-3f89-4d39-83f2-b6383556e0bd",
+      "name": "Get many events in Google Calendar2",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        1072
+      ],
+      "id": "1fdecc47-19bf-4d81-aa4a-30160278d915",
+      "name": "Get an event in Google Calendar2",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1872,
+        1072
+      ],
+      "id": "f6c63862-8a61-4e3b-bc68-d98b202de22b",
+      "name": "Update an event in Google Calendar2",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4080,
+        336
+      ],
+      "id": "90a51cea-c14e-4b8d-a814-a786cc1662d1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.from.id }}",
+        "text": "={{ $json.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3408,
+        848
+      ],
+      "id": "61f54cf1-7e8f-463a-9048-c73bcd1e47d5",
+      "name": "Send a text message1",
+      "webhookId": "aac1f9d6-0c6d-44b9-9488-120e4372edc2",
+      "credentials": {
+        "telegramApi": {
+          "id": "IRiOWzqEIMh1ShxI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        1072
+      ],
+      "id": "72b30c45-c1f0-4ad6-a933-ed11065a8c25",
+      "name": "Google Gemini Chat Model2",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "69z2oFX5BLM82Ahj",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        560,
+        1824
+      ],
+      "id": "f9dbda78-686c-4864-ab85-3c68e5b415eb",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "newer_than:1d"
+        }
+      },
+      "id": "f34912e6-0d34-48c6-b5a4-15d6573a978b",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        2032
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xG1hzKIsoOlDhoaF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $json.content || \"\";\n\n// STEP 1: ensure string\nif (typeof raw !== \"string\") {\n  raw = String(raw);\n}\n\n// STEP 2: remove escaped formatting\nraw = raw\n  .replace(/\\\\n/g, \"\")\n  .replace(/\\\\t/g, \"\")\n  .replace(/\\r/g, \"\")\n  .trim();\n\n// STEP 3: extract JSON block\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  return [{\n    json: {\n      isEvent: false,\n      error: \"No JSON found\",\n      raw\n    }\n  }];\n}\n\nlet cleaned = match[0];\n\n// STEP 4: fix escaped quotes if any\ncleaned = cleaned.replace(/\\\\\"/g, '\"');\n\nlet data;\n\ntry {\n  data = JSON.parse(cleaned);\n} catch (e) {\n  return [{\n    json: {\n      isEvent: false,\n      error: \"JSON parse failed\",\n      raw: cleaned\n    }\n  }];\n}\n\n// STEP 5: safety defaults\ndata.isEvent = data.isEvent ?? false;\ndata.priority = data.priority ?? \"low\";\n\nreturn [{ json: data }];"
+      },
+      "id": "6bac4d06-14c9-4b38-906b-5cd89181c31c",
+      "name": "Parse AI",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        832,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $json.start }}",
+          "timeMax": "={{ $json.end }}"
+        }
+      },
+      "id": "bc63af50-ded7-4af8-a249-8d9bdc6b6368",
+      "name": "Check Duplicate",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        2032
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{$json.start}}",
+        "end": "={{$json.end}}",
+        "additionalFields": {
+          "description": "Priority: {{$json.priority}}",
+          "location": "={{$json.location}}",
+          "summary": "={{$json.title}}"
+        }
+      },
+      "id": "7f54aab4-25cf-47b6-9b6b-695c9baf1976",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        2032
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=📅 Event Added!\n\n📌 {{ $('Parse AI').item.json.title }}\n🕒 {{ $('Parse AI').item.json.start }}\n📍 {{ $('Parse AI').item.json.location }}\n⚡ Priority: {{ $('Parse AI').item.json.priority }}",
+        "additionalFields": {}
+      },
+      "id": "5725704e-b979-45d9-9164-9aa93382fb5f",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        2032
+      ],
+      "webhookId": "1dc16793-9d13-4576-9f39-13185fc6d80b",
+      "credentials": {
+        "telegramApi": {
+          "id": "IRiOWzqEIMh1ShxI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extract event details from this email.\n\nReturn ONLY valid JSON:\n{\n  \"isEvent\": true/false,\n  \"title\": \"\",\n  \"start\": \"\",\n  \"end\": \"\",\n  \"location\": \"\",\n  \"priority\": \"high|medium|low\"\n}\n\nRules:\n- If not an event → isEvent=false\n- Convert dates to ISO format\n- If end missing → +1 hour\n\nEmail:\n{{$json.text}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        480,
+        2032
+      ],
+      "id": "3775fc4f-a3d8-42ca-938a-0fb69e55fa8d",
+      "name": "Message a model4",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        2032
+      ],
+      "id": "9d193f66-5e76-4ad4-ab1f-d466c5435119",
+      "name": "Get a message",
+      "webhookId": "111c1488-c20f-4911-af25-8476fe1afad5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xG1hzKIsoOlDhoaF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f51ef8c7-5fbb-432b-a493-99289667e734",
+              "leftValue": "={{ $json.isEvent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        2032
+      ],
+      "id": "929bba07-d487-4388-85c6-2125321d8e1b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "68ca3670-fc59-4d6e-b42f-029f17001cf5",
+              "leftValue": "={{ $json.canCreate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "eb3d16d1-fc67-4573-b455-0823d765bbf3",
+              "leftValue": "={{ $json.isDuplicate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1728,
+        2032
+      ],
+      "id": "78c0a1bf-394a-487d-a0af-cb0384aa9701",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "9fe85c36-48b9-444c-b87e-f66da434ed45",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        32,
+        2672
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/sync-events",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $items().map(i => i.json) }}",
+        "options": {}
+      },
+      "id": "561be7ca-acd9-4b9d-b483-747335aa7454",
+      "name": "HTTP Sync API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        928,
+        2672
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "daf437a1-ff40-401e-935e-f40dabea2e1f",
+      "name": "Google Calendar1",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        256,
+        2672
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const e = item.json;\n\n  return {\n    json: {\n      event_id: e.iCalUID,\n      title: e.summary,\n      html_link: e.htmlLink,\n\n      created_at: e.created,\n      updated_at: e.updated,\n\n      creator_email: e.creator?.email || null,\n\n      organizer: {\n        email: e.organizer?.email || null,\n        name: e.organizer?.displayName || null,\n        is_self: e.organizer?.self || false\n      },\n\n      start: {\n        datetime: e.start?.dateTime || null,\n        timezone: e.start?.timeZone || null\n      },\n\n      end: {\n        datetime: e.end?.dateTime || null,\n        timezone: e.end?.timeZone || null\n      },\n\n      sequence: e.sequence ?? 0,\n\n      reminders: {\n        use_default: e.reminders?.useDefault ?? true\n      }\n    }\n  };\n});"
+      },
+      "id": "c8543b2a-7843-4482-8b19-8ccea59bdfc9",
+      "name": "Normalize Events1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        2672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(i => {\n  return {\n    json: {\n      event_id: i.json.event_id,\n      title: i.json.title || \"Untitled\",\n\n      // flatten nested objects\n      start: i.json.start?.datetime || i.json.start,\n      end: i.json.end?.datetime || i.json.end,\n\n      // REQUIRED DEFAULTS (THIS FIXES YOUR ERROR)\n      status: i.json.status || \"synced\",\n      category: i.json.category || \"general\",\n      duration: Number(i.json.duration || 60)\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        2672
+      ],
+      "id": "5b96ff36-7bd5-42c8-9db9-607b274ef2d7",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(i => {\n  return {\n    json: {\n      event_id: i.json.id,\n      title: i.json.summary || 'Untitled',\n      start: i.json.start?.dateTime,\n      end: i.json.end?.dateTime,\n      status: 'synced',\n      category: 'general',\n      duration: 60\n    }\n  };\n});"
+      },
+      "id": "88050a64-f636-46be-89df-f0a1cca72576",
+      "name": "Normalize Events",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        2352
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/sync-events",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $items().map(i => i.json) }}",
+        "options": {}
+      },
+      "id": "c41d6b1f-b90d-4b36-b738-4053731ccfde",
+      "name": "Upsert Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        704,
+        2256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      event_ids: items.map(i => i.json.event_id)\n    }\n  }\n];"
+      },
+      "id": "630ae670-4f2e-4164-8815-ac1da8f1fc90",
+      "name": "Extract Event IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        2448
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/sync-delete-check",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json.event_ids}}",
+        "options": {}
+      },
+      "id": "01fc4b7a-4058-46ac-814a-25904fa078bd",
+      "name": "Delete Sync Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        928,
+        2448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "30fbbb8c-c312-4291-a83f-2fcbec9811a8",
+      "name": "Google Calendar2",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        256,
+        2352
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 0
+            }
+          ]
+        }
+      },
+      "id": "dae336e1-8312-432a-a776-ae791e54b3b5",
+      "name": "Weekly Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        32,
+        2896
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/weekly-summary",
+        "options": {}
+      },
+      "id": "16a97f3e-bec6-4499-a4f8-bc1287c96c9d",
+      "name": "Fetch Weekly Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        256,
+        2896
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\n\nreturn [\n  {\n    json: {\n      prompt: `You are an AI productivity analyst.\\n\\nAnalyze this weekly calendar data:\\n\\n${JSON.stringify(data, null, 2)}\\n\\nGenerate:\\n1. Weekly summary\\n2. Productivity score (0-100)\\n3. Key patterns\\n4. Issues or bottlenecks\\n5. Suggestions for next week\\n6. Short motivational message\n\n      this is the details \n      week start = $input.first().json.week_start \n      total events = $input.first().json.total_events\n      events = $input.first().json.events\n      \n      `\n    }\n  }\n];"
+      },
+      "id": "6d62c787-fb4b-4ffe-adfc-d04d9635a427",
+      "name": "Build AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        2896
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        2352
+      ],
+      "id": "b49c71fe-a33b-4c23-9d50-2228f74c3a70",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen2.5:7b",
+          "mode": "list",
+          "cachedResultName": "qwen2.5:7b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            },
+            {
+              "content": "=You are a productivity analytics assistant.\n\nAnalyze the provided weekly calendar JSON data and generate a HIGH-QUALITY professional weekly performance report.\n\nINPUT:\n{{ $json }}\n\nINSTRUCTIONS:\n\n1. Read all events carefully.\n\n2. Calculate real metrics from the data:\n\n   * Total events\n   * Total scheduled hours\n   * Average event duration\n   * Most active day\n   * Least active day\n   * Busiest time period (Morning / Afternoon / Evening / Night)\n   * Free days (if any)\n   * Completion consistency (based on spread of events)\n\n3. Categorize events intelligently from titles into:\n\n   * Study\n   * Work\n   * Health\n   * Social\n   * Personal\n   * General\n\n4. Create a Productivity Score out of 100 using:\n\n   * Time utilization\n   * Schedule consistency\n   * Balanced workload\n   * Focused categories\n   * Avoiding overload\n\n5. Detect patterns:\n\n   * Overloaded days\n   * Empty days\n   * Late-night scheduling\n   * Too many short tasks\n   * Strong routines\n   * Deep work blocks\n\n6. Give practical recommendations for next week.\n\n7. Output MUST be clean markdown with this exact structure:\n\n# Weekly Productivity Report\n\n## Overview\n\n* Week:\n* Total Events:\n* Total Hours:\n* Avg Duration:\n* Productivity Score:\n\n## Activity Breakdown\n\n* Study:\n* Work:\n* Health:\n* Social:\n* Personal:\n* General:\n\n## Weekly Insights\n\n* Most Active Day:\n* Least Active Day:\n* Busiest Time:\n* Free Days:\n* Consistency Level:\n\n## Key Patterns\n\n(3-5 bullet points based on actual data)\n\n## Problems / Bottlenecks\n\n(Only if found)\n\n## Recommendations\n\n(5 smart personalized suggestions)\n\n## Motivation\n\n(Short personalized motivational quote)\n\nIMPORTANT RULES:\n\n* Use REAL calculations from input data.\n* Be specific.\n* Sound premium and professional.\n* No fake assumptions.\n* No childish wording.\n* No unnecessary explanations.\n* If data is weak, state limitations professionally.\n* Keep report concise but insightful.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        928,
+        2896
+      ],
+      "id": "fc21da40-5daa-4cfd-8cc0-79fa4dbded4e",
+      "name": "Message a model8",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.response || $json.message || $json;\n\nlet data;\n\ntry {\n  data = JSON.parse(text);\n} catch (e) {\n  data = { raw: text };\n}\n\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        2896
+      ],
+      "id": "337b9698-39d5-48ce-85d9-0b23b99eb3fc",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/save-ai-insight",
+        "sendBody": true,
+        "contentType": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "summary",
+              "value": "={{$json.raw.content}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1504,
+        2896
+      ],
+      "id": "74a4daa5-07e0-4324-9e01-621a9387a171",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node\n// Input = weekly-summary response you pasted\n// Cleans duplicates, keeps only active events, limits to actual week,\n// and builds AI-ready summary data.\n\nconst payload = $json;\n\n// If API returns array with one object\nconst week = Array.isArray(payload) ? payload[0] : payload;\n\n// Safety fallback\nconst events = week.events || [];\n\n// Week boundaries\nconst weekStart = new Date(week.week_start);\nconst weekEnd = new Date(week.week_end);\n\n// Keep only valid events inside week range + not deleted\nconst cleaned = events\n  .map(e => ({\n    title: e[0],\n    start: e[1],\n    end: e[2],\n    category: e[3],\n    status: e[4],\n    deleted: e[5]\n  }))\n  .filter(e => {\n    const d = new Date(e.start);\n    return d >= weekStart && d < weekEnd && e.deleted === false;\n  });\n\n// Remove duplicates (same title + same start)\nconst uniqueMap = {};\nfor (const e of cleaned) {\n  const key = `${e.title}_${e.start}`;\n  uniqueMap[key] = e;\n}\n\nconst unique = Object.values(uniqueMap);\n\n// Stats\nlet totalMinutes = 0;\nconst dayCount = {};\nconst categoryCount = {};\n\nfor (const e of unique) {\n  const start = new Date(e.start);\n  const end = new Date(e.end);\n\n  const mins = Math.round((end - start) / 60000);\n  totalMinutes += mins;\n\n  const day = start.toLocaleDateString('en-US', { weekday: 'long' });\n  dayCount[day] = (dayCount[day] || 0) + 1;\n\n  categoryCount[e.category] = (categoryCount[e.category] || 0) + 1;\n}\n\n// busiest day\nlet busiestDay = \"None\";\nlet max = 0;\n\nfor (const d in dayCount) {\n  if (dayCount[d] > max) {\n    max = dayCount[d];\n    busiestDay = d;\n  }\n}\n\n// Output for Ollama\nreturn [\n{\n  json: {\n    week_start: week.week_start,\n    week_end: week.week_end,\n    total_events: unique.length,\n    total_hours: +(totalMinutes / 60).toFixed(1),\n    busiest_day: busiestDay,\n    category_breakdown: categoryCount,\n    events: unique\n  }\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        2896
+      ],
+      "id": "3dec960d-7ff8-4a1a-8056-31776669a29e",
+      "name": "Code in JavaScript12"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        1200
+      ],
+      "id": "5493b4ca-c45c-4eac-8bd9-c72be54cb774",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "8rlZesBIVwrr6ipY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2336,
+        1200
+      ],
+      "id": "c5da5a81-b328-4f81-8629-0795a21821d7",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2464,
+        1200
+      ],
+      "id": "8a06d2f0-e292-4a24-b52f-1f5947aa5a04",
+      "name": "Delete an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2592,
+        1200
+      ],
+      "id": "9360a488-30e2-4cef-aeb7-adaa357536bf",
+      "name": "Get many events in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2720,
+        1200
+      ],
+      "id": "e353c54e-e380-417e-a0cd-25643509772d",
+      "name": "Get an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2848,
+        1200
+      ],
+      "id": "55b6b1d1-ace3-4d0e-a8f4-e07b47ebbc0a",
+      "name": "Update an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2208,
+        1200
+      ],
+      "id": "e88a2eb6-ff16-45c8-809a-951fb9d1f858",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "VKnNQvGo05yxC2nB",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1216,
+        1088
+      ],
+      "id": "5281444b-8128-4db7-ab49-8068af6388b8",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "VKnNQvGo05yxC2nB",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen2.5:7b",
+          "mode": "list",
+          "cachedResultName": "qwen2.5:7b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Classify the following user request:\n\n{{$json.query}}\n\nPriority Rules (VERY IMPORTANT):\n1. If request is about adding, scheduling, booking, setting, reminding, moving, or planning ONE event with a specific date/time → type = \"other\"\n2. Only use \"study\" when user asks to learn, prepare, solve homework, make study notes, explain subject, or create a study plan\n3. If request asks for multi-day/weekly/monthly roadmap or routine → type = \"other plans\"\n4. If request is workout/gym/health related → type = \"fitness\"\n\nExamples:\n- add SE class tomorrow 10 am to 12 pm → other\n- schedule math exam on friday → other\n- remind me to study tonight → other\n- make me a study timetable for exams → study\n- teach me calculus basics → study\n- 30 day gym plan → fitness\n- weekly productivity routine → other plans\n- if it is not planing then → other\n\nNow classify this request:\n\n{{$json.query}}\n\nReturn ONLY valid JSON:\n{\n  \"type\": \"\",\n  \"goal\": \"\",\n  \"Duration\": \"\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        304,
+        416
+      ],
+      "id": "6e142071-5a10-4ab5-9ca7-01099ad87c91",
+      "name": "Classify intent",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    query: $json.message.text,\n    chat_id: $json.message.chat.id\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        416
+      ],
+      "id": "c951bb69-a08c-4d21-b4cd-75d3c0bcdca4",
+      "name": "message to object"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.content || \"\";\n\n// clean markdown + noise\nlet cleaned = raw.replace(/```json|```/g, '').trim();\n\n// extract JSON block safely\nconst start = cleaned.indexOf('{');\nconst end = cleaned.lastIndexOf('}');\n\nif (start === -1 || end === -1) {\n  throw new Error(\"No JSON found in input\");\n}\n\ncleaned = cleaned.slice(start, end + 1);\n\n// fix common AI mistake: missing commas (basic repair)\ncleaned = cleaned.replace(/\"\\s*\\n\\s*\"/g, '\",\\n\"');\n\nlet data;\n\ntry {\n  data = JSON.parse(cleaned);\n} catch (e) {\n  throw new Error(\"Still invalid JSON after cleanup: \" + e.message);\n}\n\nreturn [{\n  json: {\n    type: data.type,\n    goal: data.goal,\n    duration: data.Duration || data.duration\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        416
+      ],
+      "id": "95e0ae78-6b1b-4465-99b6-cd53e0d14f1c",
+      "name": "text to object"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a plan for:\n\n{{$json.goal}}\n\n----------------------------------------\nRULES\n----------------------------------------\n\nYou are a STRICT JSON generator.\n\nYou MUST:\n- Generate 10–15 sessions\n- Keep sessions logically ordered from basics → advanced\n- Each session must include:\n  - title (short and clear)\n  - description (1–2 sentences)\n  - duration (INTEGER in minutes only)\n\n----------------------------------------\nSTRICT REQUIREMENTS\n----------------------------------------\n\n- duration MUST be a number (e.g. 60, 90, 120)\n- DO NOT use strings like \"2 hours\"\n- DO NOT add markdown (NO ```json)\n- DO NOT add explanations or extra text\n- DO NOT add comments\n- DO NOT wrap output in text\n\n----------------------------------------\nOUTPUT FORMAT (MANDATORY)\n----------------------------------------\n\nReturn ONLY valid JSON in exactly this format:\n\n{\n  \"sessions\": [\n    {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"duration\": number\n    }\n  ]\n}\n\n----------------------------------------\nVALIDATION CHECK (BEFORE OUTPUT)\n----------------------------------------\n\nEnsure:\n- JSON is valid and parseable\n- No trailing commas\n- All keys are correct\n- duration is a pure integer\n- No extra text exists outside JSON\n\nReturn ONLY JSON."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        528
+      ],
+      "id": "b0c127a2-d4c0-4c12-ad57-5a6168ecfafa",
+      "name": "Generates other plan",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a study plan for:\n\n{{$json.goal}}\n\nRules:\n- Generate 10–15 sessions\n- Each session MUST include:\n  - title (short and clear)\n  - description (1–2 sentences)\n  - duration (INTEGER in minutes only)\n\nSTRICT REQUIREMENTS:\n- duration must be a number (e.g. 60, 90, 120)\n- DO NOT use text like \"2 hours\"\n- DO NOT include markdown (no ```json)\n- DO NOT include explanations\n- Output ONLY valid JSON\n- Ensure JSON is directly parsable\n\nOutput format:\n{\n  \"sessions\": [\n    {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"duration\": number\n    }\n  ]\n}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        144
+      ],
+      "id": "27e4ffd5-772e-491d-afa2-14a8e01e51a5",
+      "name": "Generates structured study plan1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a study plan for:\n\n{{$json.goal}}\n\n----------------------------------------\nRULES\n----------------------------------------\n\nYou are a STRICT JSON generator.\n\nYou MUST:\n- Generate 10–15 sessions\n- Keep sessions logically ordered from basics → advanced\n- Each session must include:\n  - title (short and clear)\n  - description (1–2 sentences)\n  - duration (INTEGER in minutes only)\n\n----------------------------------------\nSTRICT REQUIREMENTS\n----------------------------------------\n\n- duration MUST be a number (e.g. 60, 90, 120)\n- DO NOT use strings like \"2 hours\"\n- DO NOT add markdown (NO ```json)\n- DO NOT add explanations or extra text\n- DO NOT add comments\n- DO NOT wrap output in text\n\n----------------------------------------\nOUTPUT FORMAT (MANDATORY)\n----------------------------------------\n\nReturn ONLY valid JSON in exactly this format:\n\n{\n  \"sessions\": [\n    {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"duration\": number\n    }\n  ]\n}\n\n----------------------------------------\nVALIDATION CHECK (BEFORE OUTPUT)\n----------------------------------------\n\nEnsure:\n- JSON is valid and parseable\n- No trailing commas\n- All keys are correct\n- duration is a pure integer\n- No extra text exists outside JSON\n\nReturn ONLY JSON."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        336
+      ],
+      "id": "651371bb-e78e-4971-bd21-d8eee946d3ca",
+      "name": "Generates structured fitness plan",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are LifeOps, the ultimate AI academic and career planning assistant.\n{{ $json.goal }}{{ $('message to object').item.json.query }}\nCURRENT DATE: {{$now}}\nUSER TIMEZONE: Asia/Karachi (UTC+05:00)\n\nYOUR GOALS:\n\n1. Automatically generate a daily/weekly schedule based on user tasks, assignments, projects, study, career prep, personal development, or gym.\n2. For each event, automatically generate:\n   - summary → concise event title\n   - description → detailed description of the task\n3. Schedule events intelligently:\n   - Flexible events (study, assignment, research, skill learning, personal development) can move\n   - Maximum deep work block = 2 hours\n   - Add 10–15 minute buffer between events\n   - Avoid heavy tasks back-to-back\n   - Leave at least one free buffer period daily\n   - Protect sleep and prevent burnout\n4. Always use Pakistan timezone (UTC+05:00) and ISO 8601 with offset (+05:00)\n\nSCHEDULING RULES:\n\n- If the user asks \"create schedule\", automatically generate all tasks for the day/week with proper titles and descriptions.\n- Use the Google Calendar \"Create Event\" tool for all events. Never output plain text for scheduling.\n- Always fill:\n   - summary\n   - description\n   - start.dateTime\n   - end.dateTime\n- One tool call per event\n\nMISSED OR SKIPPED TASKS:\n\n- If the user reports they skipped a task:\n   - Identify the missed task\n   - Find earliest available flexible slot\n   - Reschedule it\n   - Adjust other flexible tasks if necessary\n   - Update Google Calendar (delete old event → create new event)\n   - Confirm new schedule to the user\n\nEXAMPLES:\n\n- User: \"Create schedule for today\"\n  → AI generates:\n    summary: \"AI Study Session\"\n    description: \"Complete neural network assignment\"\n    start.dateTime: \"2026-03-30T16:00:00+05:00\"\n    end.dateTime: \"2026-03-30T17:00:00+05:00\"\n  (and schedules all other tasks for the day automatically)\n\n- User: \"I skipped my 4 PM revision\"\n  → AI reschedules revision to next available flexible slot\n  → Adjusts other flexible events to prevent overload\n  → Updates Google Calendar accordingly\n\nRULES:\n\n1. Never leave summary or description empty.\n2. Always use ISO 8601 with +05:00 offset.\n3. Do not output raw JSON or text for scheduling.\n4. Always call Google Calendar tool for creating, deleting, or rescheduling events.\n5. Do not overload a single day.\n6. Maintain balance between work, study, and personal life.\n7.text is sending to telegram so make the message pleasant for user\n8.access calendar and look for current schedule whenever needed\n9. when an error occurred try to solve it intelligently without informing user\n10. if the querry is not about events then act as a normal assistant\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1424,
+        848
+      ],
+      "id": "da9a22ac-7829-4c70-9fef-18772ace9d7d",
+      "name": "replying to other type querries",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.content;\n\n// remove extra spaces\nconst cleaned = raw.trim();\n\n// convert string → JSON\nconst parsed = JSON.parse(cleaned);\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        336
+      ],
+      "id": "a1bc6473-b727-4874-8d34-d9ca1f9288c7",
+      "name": "text to object1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen2.5:7b",
+          "mode": "list",
+          "cachedResultName": "qwen2.5:7b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a TIME RANGE CALCULATOR.\n\nCURRENT TIME:\n{{$now}}\n\nTIMEZONE:\nAsia/Karachi (+05:00)\n\nINPUT:\nYou will receive:\n- current_time (ISO 8601)\n- time_window (text like \"1 day\", \"3 days\", \"7 days\", \"1 month\", \"30 days\")\n\nTASK:\nCalculate a time range based on the input.\n\nRULES:\n- start MUST be equal to current_time\n- end MUST be calculated from current_time + time_window\n- time_window meanings:\n  - \"1 day\" → +1 day\n  - \"3 days\" → +3 days\n  - \"7 days\" → +7 days\n  - \"1 month\" → +30 days\n  - \"30 days\" → +30 days\n- Use only valid ISO 8601 format\n- Keep timezone +05:00\n- Do NOT use calendar or external tools\n- Do NOT explain anything\n\nOUTPUT RULE:\nReturn ONLY JSON\n\nFORMAT:\n{\n  \"start\": \"ISO 8601 +05:00\",\n  \"end\": \"ISO 8601 +05:00\"\n}\n\nINPUT:\n{\n  \"current_time\": \"{{ $now }}\",\n  \"time_window\": \"{{ $('Switch').item.json.duration }}\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        560
+      ],
+      "id": "19928d7a-a375-4ae6-8b4c-990c63b3542c",
+      "name": "Time Range Calculator",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let clean = $json.content\n  .replace(/```json/g, '')\n  .replace(/```/g, '')\n  .trim();\n\ntry {\n  return [\n    {\n      json: JSON.parse(clean)\n    }\n  ];\n} catch (e) {\n  return [\n    {\n      json: { error: \"Invalid JSON\", raw: clean }\n    }\n  ];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3408,
+        560
+      ],
+      "id": "83a1e73b-8ba1-4888-b9f4-5e7e98bda769",
+      "name": "text to object2"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "YOUR_CALENDAR_ID@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "LifeOps"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.start }}",
+        "timeMax": "={{ $json.end }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        3632,
+        560
+      ],
+      "id": "3b7962ac-6679-409a-912c-48b7ea4fa816",
+      "name": "getting events",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "hk9SlIQIxR2Vaez5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rangeStart = new Date($('text to object2').first().json.start);\nconst rangeEnd = new Date($('text to object2').first().json.end);\n\n// get all calendar items\nconst events = $input.all().map(i => {\n  const e = i.json;\n\n  const start = e.start?.dateTime || e.start?.date;\n  const end = e.end?.dateTime || e.end?.date;\n\n  return {\n    start: new Date(start),\n    end: new Date(end)\n  };\n});\n\n// sort events\nevents.sort((a, b) => a.start - b.start);\n\nlet freeSlots = [];\nlet current = new Date(rangeStart);\n\nfor (const event of events) {\n  // skip events outside range\n  if (event.end <= rangeStart || event.start >= rangeEnd) continue;\n\n  const eventStart = new Date(Math.max(event.start, rangeStart));\n  const eventEnd = new Date(Math.min(event.end, rangeEnd));\n\n  if (eventStart > current) {\n    freeSlots.push({\n      start: current.toISOString(),\n      end: eventStart.toISOString()\n    });\n  }\n\n  if (eventEnd > current) {\n    current = eventEnd;\n  }\n}\n\n// last slot\nif (current < rangeEnd) {\n  freeSlots.push({\n    start: current.toISOString(),\n    end: rangeEnd.toISOString()\n  });\n}\n\nreturn [\n  {\n    json: {\n      free_slots: freeSlots\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        560
+      ],
+      "id": "456795fb-d09f-4b62-9748-90e3644d30c6",
+      "name": "finding free slots"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessions = $items().find(i => i.json.sessions)?.json.sessions;\nconst free_slots = $items().find(i => i.json.free_slots)?.json.free_slots;\n\nreturn [\n  {\n    json: {\n      sessions,\n      free_slots\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4304,
+        336
+      ],
+      "id": "4bfa0718-212f-4880-807c-0f51e7b4a97f",
+      "name": "free slots"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// INPUT\nconst sessions = $json.sessions;\n\n// flatten + sort slots\nlet slots = $json.free_slots\n  .map(s => ({\n    start: new Date(s.start),\n    end: new Date(s.end)\n  }))\n  .filter(s => s.end > s.start)\n  .sort((a, b) => a.start - b.start);\n\n// helpers\nfunction addMinutes(date, min) {\n  return new Date(date.getTime() + min * 60000);\n}\n\n// build full timeline capacity\nlet totalDuration = 0;\nfor (let s of slots) {\n  totalDuration += (s.end - s.start);\n}\n\n// assign sessions proportionally\nlet results = [];\nlet pointer = 0;\n\nfor (let i = 0; i < sessions.length; i++) {\n\n  let session = sessions[i];\n\n  // target position in timeline (spread evenly)\n  let ratio = i / sessions.length;\n  let targetTime = new Date(slots[0].start.getTime() + totalDuration * ratio);\n\n  let found = null;\n\n  for (let slot of slots) {\n\n    let start = new Date(Math.max(slot.start, targetTime));\n    start = addMinutes(start, 10); // gap\n\n    let end = addMinutes(start, session.duration);\n\n    if (end <= slot.end) {\n      found = { start, end };\n      break;\n    }\n  }\n\n  if (!found) {\n    throw new Error(\"No slot for: \" + session.title);\n  }\n\n  results.push({\n    title: session.title,\n    description: session.description,\n    start: found.start.toISOString(),\n    end: found.end.toISOString()\n  });\n}\n\nreturn [{ json: { sessions: results } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4528,
+        336
+      ],
+      "id": "de848757-a2cc-466c-aa04-c60daf32aea4",
+      "name": "flatten + sort slots"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.sessions.map(s => ({\n  json: s\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4752,
+        336
+      ],
+      "id": "26fa8533-6b44-4d96-81de-814e9b183bd5",
+      "name": "to objects"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst events = $input.all().map(i => i.json);\n\n// group by date (Asia/Karachi aware)\nfunction getDateKey(dateStr) {\n  const d = new Date(dateStr);\n  return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' }); \n}\n\n// build grouped structure\nconst grouped = {};\n\nfor (const e of events) {\n\n  const start = e.start?.dateTime || e.start?.date;\n  const end = e.end?.dateTime || e.end?.date;\n\n  const dateKey = getDateKey(start);\n\n  if (!grouped[dateKey]) {\n    grouped[dateKey] = [];\n  }\n\n  grouped[dateKey].push({\n    title: e.summary,\n    description: e.description || \"\",\n    start,\n    end\n  });\n}\n\n// convert to AI-friendly structured format\nconst schedule = Object.keys(grouped)\n  .sort()\n  .map(date => ({\n    date,\n    items: grouped[date].sort((a, b) => new Date(a.start) - new Date(b.start))\n  }));\n\nreturn [\n  {\n    json: {\n      schedule\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5200,
+        336
+      ],
+      "id": "2d0422f7-7c38-4e92-a4f7-ac28baf7e5f9",
+      "name": "convert to AI-friendly structure"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a professional scheduling assistant.\n\nYou are given a JSON schedule grouped by date.\n\nINPUT:\n{{ JSON.stringify($json.schedule, null, 2) }}\n\nTASK:\nConvert this schedule into a clear, friendly message for the user.\n\nRULES:\n- DO NOT change any data\n- DO NOT reorder items\n- DO NOT add new events\n- DO NOT hallucinate\n- Use simple human language\n- Keep order exactly as given\n- Convert ISO time into readable time (Asia/Karachi)\n- Group output by date\n- Be concise and clean\n\nOUTPUT FORMAT:\n\nStart with:\n\"Here is your updated schedule:\"\n\nThen format like:\n\n📅 Date (Day Name if possible)\n⏰ Time → Title\n   Description\n\nKeep spacing clean and readable.\nReturn ONLY text."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        5424,
+        336
+      ],
+      "id": "3118d3da-31fd-4d27-ac08-49f32cdb8cea",
+      "name": "Generating text",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are LifeOps, the ultimate AI academic and career planning assistant.\n{{ $json.goal }}\nCURRENT DATE: {{$now}}\nUSER TIMEZONE: Asia/Karachi (UTC+05:00)\n\nYOUR GOALS:\n\n1. Automatically generate a daily/weekly schedule based on user tasks, assignments, projects, study, career prep, personal development, or gym.\n2. For each event, automatically generate:\n   - summary → concise event title\n   - description → detailed description of the task\n3. Schedule events intelligently:\n   - Flexible events (study, assignment, research, skill learning, personal development) can move\n   - Maximum deep work block = 2 hours\n   - Add 10–15 minute buffer between events\n   - Avoid heavy tasks back-to-back\n   - Leave at least one free buffer period daily\n   - Protect sleep and prevent burnout\n4. Always use Pakistan timezone (UTC+05:00) and ISO 8601 with offset (+05:00)\n\nSCHEDULING RULES:\n\n- If the user asks \"create schedule\", automatically generate all tasks for the day/week with proper titles and descriptions.\n- Use the Google Calendar \"Create Event\" tool for all events. Never output plain text for scheduling.\n- Always fill:\n   - summary\n   - description\n   - start.dateTime\n   - end.dateTime\n- One tool call per event\n\nMISSED OR SKIPPED TASKS:\n\n- If the user reports they skipped a task:\n   - Identify the missed task\n   - Find earliest available flexible slot\n   - Reschedule it\n   - Adjust other flexible tasks if necessary\n   - Update Google Calendar (delete old event → create new event)\n   - Confirm new schedule to the user\n\nEXAMPLES:\n\n- User: \"Create schedule for today\"\n  → AI generates:\n    summary: \"AI Study Session\"\n    description: \"Complete neural network assignment\"\n    start.dateTime: \"2026-03-30T16:00:00+05:00\"\n    end.dateTime: \"2026-03-30T17:00:00+05:00\"\n  (and schedules all other tasks for the day automatically)\n\n- User: \"I skipped my 4 PM revision\"\n  → AI reschedules revision to next available flexible slot\n  → Adjusts other flexible events to prevent overload\n  → Updates Google Calendar accordingly\n\nRULES:\n\n1. Never leave summary or description empty.\n2. Always use ISO 8601 with +05:00 offset.\n3. Do not output raw JSON or text for scheduling.\n4. Always call Google Calendar tool for creating, deleting, or rescheduling events.\n5. Do not overload a single day.\n6. Maintain balance between work, study, and personal life.\n7.text is sending to telegram so make the message pleasant for user\n8.access calendar and look for current schedule whenever needed\n9. when an error occurred try to solve it intelligently without informing user\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2400,
+        976
+      ],
+      "id": "c9a81b8b-8c36-4b57-8dff-dcb73ee462b9",
+      "name": "replying to other type quarries backup"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "mistral:latest",
+          "mode": "list",
+          "cachedResultName": "mistral:latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=make this to appear plesent by adding relevent emojies. dont change the message but just edit it with emojies  {{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        848
+      ],
+      "id": "6479a01f-b86f-4e10-be20-d610b85844bf",
+      "name": "Generating Text",
+      "credentials": {
+        "ollamaApi": {
+          "id": "0tQXIAmn4FXCfhSr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Automatic Event Remainder",
+        "height": 384,
+        "width": 1808,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        1584
+      ],
+      "id": "b2691afa-27d5-467f-bc60-da98cf9ad1ee",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "main \n",
+        "height": 1536,
+        "width": 6672,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -32
+      ],
+      "id": "ad97dbc3-8c7d-47cb-b62a-237c609c1420",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Automatic Email Event Schedular",
+        "height": 192,
+        "width": 2736,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        2000
+      ],
+      "id": "c29c8f6a-166c-4016-a959-90bb7a7644f8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Realtime Update on webpage",
+        "height": 912,
+        "width": 2192,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        2240
+      ],
+      "id": "8cc8a938-7371-41fe-8a61-ec01ac43a417",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.summary }}{{ $json.htmlLink }}{{ $json.start.dateTime }}{{ $json.description }}",
+        "options": {
+          "systemMessage": "=You are an assistant that checks upcoming calendar events.\nLook at the data from the previous node.\nIf any event is starting within the next 15-20 minutes,\nwrite a short, friendly reminder email including:\n- Event title\n- Start time\n- Remaining minutes\n- A short note like \"Don't forget your meeting!\"\nIf no event is upcoming, just say \"No reminders right now.\"\n only send the message no need of reasonings plain emain note"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        1600
+      ],
+      "id": "d72a04b4-81b0-479f-be8b-03847a6dd9ec",
+      "name": "email text generation"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newEvent = $input.first().json;\n\nconst items = $items(\"Check Duplicate\") || [];\n\n// filter REAL calendar events (ignore empty {})\nconst validEvents = items.filter(e => {\n  return e.json &&\n         e.json.start &&\n         (e.json.start.dateTime || e.json.start);\n});\n\n// If no real events → safe to create\nif (validEvents.length === 0) {\n  return [{\n    json: {\n      canCreate: true,\n      isDuplicate: false,\n      reason: \"No real events found (empty calendar result)\"\n    }\n  }];\n}\n\n// check overlap\nfunction overlap(aStart, aEnd, bStart, bEnd) {\n  return new Date(aStart) < new Date(bEnd) &&\n         new Date(aEnd) > new Date(bStart);\n}\n\nlet conflicts = [];\n\nfor (const e of validEvents) {\n  const start = e.json.start?.dateTime || e.json.start;\n  const end = e.json.end?.dateTime || e.json.end;\n\n  if (!start || !end) continue;\n\n  if (overlap(newEvent.start, newEvent.end, start, end)) {\n    conflicts.push(e.json);\n  }\n}\n\nreturn [{\n  json: {\n    canCreate: conflicts.length === 0,\n    isDuplicate: conflicts.length > 0,\n    conflicts,\n    event: newEvent\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        2032
+      ],
+      "id": "1c777f3b-e51a-4ca3-b086-9bbb1afdec3a",
+      "name": "events to Objects"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "email text generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar Trigger": {
+      "main": [
+        [
+          {
+            "node": "email text generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "message to object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Generates structured study plan1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generates structured fitness plan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generates other plan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "convert to AI-friendly structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar2": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar2": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events in Google Calendar2": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an event in Google Calendar2": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event in Google Calendar2": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "free slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "email text generation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate": {
+      "main": [
+        [
+          {
+            "node": "events to Objects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Parse AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar1": {
+      "main": [
+        [
+          {
+            "node": "Normalize Events1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Events1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Sync API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Events": {
+      "main": [
+        [
+          {
+            "node": "Upsert Events",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Event IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Events": {
+      "main": [
+        []
+      ]
+    },
+    "Extract Event IDs": {
+      "main": [
+        [
+          {
+            "node": "Delete Sync Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar2": {
+      "main": [
+        [
+          {
+            "node": "Normalize Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Weekly Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Weekly Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model8": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript12": {
+      "main": [
+        [
+          {
+            "node": "Build AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "replying to other type querries",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify intent": {
+      "main": [
+        [
+          {
+            "node": "text to object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message to object": {
+      "main": [
+        [
+          {
+            "node": "Classify intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text to object": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generates other plan": {
+      "main": [
+        [
+          {
+            "node": "text to object1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generates structured study plan1": {
+      "main": [
+        [
+          {
+            "node": "text to object1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generates structured fitness plan": {
+      "main": [
+        [
+          {
+            "node": "text to object1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "replying to other type querries": {
+      "main": [
+        [
+          {
+            "node": "Generating Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "replying to other type quarries backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text to object1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Time Range Calculator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time Range Calculator": {
+      "main": [
+        [
+          {
+            "node": "text to object2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text to object2": {
+      "main": [
+        [
+          {
+            "node": "getting events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getting events": {
+      "main": [
+        [
+          {
+            "node": "finding free slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finding free slots": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "free slots": {
+      "main": [
+        [
+          {
+            "node": "flatten + sort slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "flatten + sort slots": {
+      "main": [
+        [
+          {
+            "node": "to objects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "to objects": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert to AI-friendly structure": {
+      "main": [
+        [
+          {
+            "node": "Generating text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generating text": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "replying to other type quarries backup": {
+      "main": [
+        [
+          {
+            "node": "Generating Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generating Text": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email text generation": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "events to Objects": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Karachi",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "bb5af764-9837-45c4-ab62-1fc50350ba33",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8956ce985bce52943148e2bc5de8cfc2fad03f7b6a21aca5464816952c9ee67e"
+  },
+  "id": "_PdXX7j53peVvTsyuTJCk",
+  "tags": []
+}

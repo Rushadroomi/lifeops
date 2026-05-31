@@ -1,0 +1,94 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  LifeOps — Full Stack
+#  Services: postgres · fastapi-backend · n8n
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: lifeops_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       events_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}        # from .env — never hardcode
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lifeops_net
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lifeops_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST:          db
+      DB_NAME:          events_db
+      DB_USER:          postgres
+      DB_PASSWORD:      ${DB_PASSWORD}
+      LIFEOPS_API_KEY:  ${LIFEOPS_API_KEY}
+      N8N_WEBHOOK_URL:  http://n8n:5678/webhook/create-event-from-dashboard
+      OLLAMA_URL:       ${OLLAMA_URL:-http://host.docker.internal:11434}
+      CORS_ORIGINS:     http://localhost:5678,${N8N_PUBLIC_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lifeops_net
+
+  # ── n8n ─────────────────────────────────────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: lifeops_n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_BASIC_AUTH_ACTIVE:    "true"
+      N8N_BASIC_AUTH_USER:      ${N8N_USER}
+      N8N_BASIC_AUTH_PASSWORD:  ${N8N_PASSWORD}
+      WEBHOOK_URL:               ${N8N_PUBLIC_URL}
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "false"
+      # Point n8n to the backend — use service name (not localhost)
+      LIFEOPS_BACKEND_URL:      http://backend:8000
+      LIFEOPS_API_KEY:          ${LIFEOPS_API_KEY}
+      DB_TYPE:                  postgresdb
+      DB_POSTGRESDB_HOST:       db
+      DB_POSTGRESDB_PORT:       5432
+      DB_POSTGRESDB_DATABASE:   n8n_db
+      DB_POSTGRESDB_USER:       postgres
+      DB_POSTGRESDB_PASSWORD:   ${DB_PASSWORD}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lifeops_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # allows Ollama access on Windows too
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  n8n_data:
+
+# ── Network ──────────────────────────────────────────────────────────────────
+networks:
+  lifeops_net:
+    driver: bridge
